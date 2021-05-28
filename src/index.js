@@ -4,9 +4,12 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+import BokehTest from './Bokeh-test';
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
+    {/* <BokehTest></BokehTest> */}
   </React.StrictMode>,
   document.getElementById('root')
 );
