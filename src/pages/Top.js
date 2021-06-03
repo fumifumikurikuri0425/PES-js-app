@@ -20,7 +20,7 @@ function Top() {
     event.preventDefault();
     console.log('submit!!!');
 
-    const endpoint = 'http://127.0.0.1:8000/api';
+    const endpoint = 'http://127.0.0.1:8000/api/test';
     const response = await fetch(endpoint);
     console.log(response);
     // console.log(await response.text())
