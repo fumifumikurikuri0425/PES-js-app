@@ -41,6 +41,7 @@ function Ex1() {
         ['y', '$y'],
         ['value', '@image'],
       ],
+      tools: 'tap',
       width: 700,
       height: 530,
     });
@@ -59,7 +60,7 @@ function Ex1() {
       console.log(colorMapper);
 
       console.log('image data:', data.data.energy);
-      p.image({
+      const image = p.image({
         image: [data.data.energy],
         x: params.xmin,
         y: params.ymin,
@@ -74,6 +75,28 @@ function Ex1() {
         y: params.y,
         size: 10,
       });
+
+      p.js_event_callbacks['tap'] = [
+        new Bokeh.CustomJS({
+          execute: (event) => {
+            console.log('Tap event occurred at x-position: ' + event.x);
+          },
+        }),
+      ];
+      p.js_event_callbacks['mousemove'] = [
+        new Bokeh.CustomJS({
+          execute: (event) => {
+            console.log('Tap event occurred at x-position: ' + event.x);
+          },
+        }),
+      ];
+
+      p.x_range
+        .property('start')
+        .change.connect((_args, x_range) => console.log(x_range.start));
+
+      window.image = image;
+      window.p = p;
     }
 
     views = await Bokeh.Plotting.show(p, bokehRoot.current);
