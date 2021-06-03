@@ -17,6 +17,15 @@ const initialParams = {
 
 const apiEndpoint = 'http://localhost:8000/api/test';
 
+function makeArr(startValue, stopValue, cardinality) {
+  var arr = [];
+  var step = (stopValue - startValue) / (cardinality - 1);
+  for (var i = 0; i < cardinality; i++) {
+    arr.push(startValue + step * i);
+  }
+  return arr;
+}
+
 function Ex1() {
   const bokehRoot = useRef(null);
   const [params, setParams] = useState(initialParams);
@@ -34,17 +43,25 @@ function Ex1() {
   };
 
   const createPlot = async () => {
+    const xRange = new Bokeh.DataRange1d({
+      range_padding: 0,
+    });
+    const yRange = new Bokeh.DataRange1d({
+      range_padding: 0,
+    });
+
     // create bokeh figure
     const p = Bokeh.Plotting.figure({
-      tooltips: [
-        ['x', '$x'],
-        ['y', '$y'],
-        ['value', '@image'],
-      ],
-      tools: 'tap',
+      // tools: 'tap',
+      x_range: xRange,
+      y_range: yRange,
+      padding: 0,
       width: 700,
       height: 530,
     });
+
+    // p.x_range.range_padding = p.y_range.range_padding = 0;
+    p.xgrid[0].grid_line_width = p.ygrid[0].grid_line_width = 0;
 
     if (data) {
       // console.log('draw graph!!!', data);
@@ -57,9 +74,20 @@ function Ex1() {
         high: params.zmax,
       });
 
-      console.log(colorMapper);
+      const levels = makeArr(params.zmin, params.zmax, params.tone + 1);
 
-      console.log('image data:', data.data.energy);
+      const colorBar = new Bokeh.ColorBar({
+        color_mapper: colorMapper,
+        major_label_text_font_size: '8pt',
+        ticker: new Bokeh.FixedTicker({ ticks: levels }),
+        formatter: new Bokeh.PrintfTickFormatter({ format: '%.2f' }),
+        label_standoff: 6,
+        border_line_color: null,
+        location: [0, 0],
+      });
+
+      p.add_layout(colorBar, 'right');
+
       const image = p.image({
         image: [data.data.energy],
         x: params.xmin,
@@ -70,30 +98,79 @@ function Ex1() {
         level: 'image',
       });
 
-      p.cross({
-        x: params.x,
-        y: params.y,
+      const tooltip = [
+        ['x', '$x'],
+        ['y', '$y'],
+        ['energy', '@image'],
+      ];
+      const ht = new Bokeh.HoverTool({ tooltips: tooltip });
+      p.add_tools(ht);
+
+      const cds = new Bokeh.ColumnDataSource({
+        data: {
+          x: [params.x],
+          y: [params.y],
+        },
+      });
+      window.cds = cds;
+
+      p.x({
+        x: { field: 'x' },
+        y: { field: 'y' },
         size: 10,
+        source: cds,
       });
 
       p.js_event_callbacks['tap'] = [
-        new Bokeh.CustomJS({
-          execute: (event) => {
-            console.log('Tap event occurred at x-position: ' + event.x);
+        {
+          execute(event) {
+            console.log('tap', event.x, event.y);
+            setParams({
+              ...params,
+              x: event.x,
+              y: event.y,
+            });
+
+            cds.data.x[0] = event.x;
+            cds.data.y[0] = event.y;
+            cds.change.emit();
           },
-        }),
-      ];
-      p.js_event_callbacks['mousemove'] = [
-        new Bokeh.CustomJS({
-          execute: (event) => {
-            console.log('Tap event occurred at x-position: ' + event.x);
-          },
-        }),
+        },
       ];
 
-      p.x_range
-        .property('start')
-        .change.connect((_args, x_range) => console.log(x_range.start));
+      // TODO: add line
+
+      p.x_range.property('start').change.connect((_args, x_range) => {
+        console.log('x_range.start', x_range.start);
+        setParams((params) => ({
+          ...params,
+          xmin: x_range.start,
+        }));
+      });
+
+      p.x_range.property('end').change.connect((_args, x_range) => {
+        console.log('x_range.end', x_range.end);
+        setParams((params) => ({
+          ...params,
+          xmax: x_range.end,
+        }));
+      });
+
+      p.y_range.property('start').change.connect((_args, y_range) => {
+        console.log('y_range.start', y_range.start);
+        setParams((params) => ({
+          ...params,
+          ymin: y_range.start,
+        }));
+      });
+
+      p.y_range.property('end').change.connect((_args, y_range) => {
+        console.log('y_range.end', y_range.end);
+        setParams((params) => ({
+          ...params,
+          ymax: y_range.end,
+        }));
+      });
 
       window.image = image;
       window.p = p;
@@ -161,6 +238,42 @@ function Ex1() {
             type="text"
             name="y"
             value={params.y}
+            onChange={handleChange}
+          />
+        </label>
+        <label>
+          xmin:
+          <input
+            type="text"
+            name="xmin"
+            value={params.xmin}
+            onChange={handleChange}
+          />
+        </label>
+        <label>
+          xmax:
+          <input
+            type="text"
+            name="xmax"
+            value={params.xmax}
+            onChange={handleChange}
+          />
+        </label>
+        <label>
+          ymin:
+          <input
+            type="text"
+            name="ymin"
+            value={params.ymin}
+            onChange={handleChange}
+          />
+        </label>
+        <label>
+          ymax:
+          <input
+            type="text"
+            name="ymax"
+            value={params.ymax}
             onChange={handleChange}
           />
         </label>
