@@ -46,23 +46,33 @@ function Ex1() {
     });
 
     if (data) {
-      console.log('draw graph!!!', data);
+      // console.log('draw graph!!!', data);
+      // console.log('params', params);
 
       const pal = gPalette('tol-dv', params.tone).map((c) => `#${c}`);
       const colorMapper = new Bokeh.LinearColorMapper({
-        palettes: pal,
+        palette: pal,
         low: params.zmin,
         high: params.zmax,
       });
 
+      console.log(colorMapper);
+
       console.log('image data:', data.data.energy);
       p.image({
-        image: data.data.energy,
+        image: [data.data.energy],
         x: params.xmin,
         y: params.ymin,
         dw: params.xmax - params.xmin,
         dh: params.ymax - params.ymin,
+        color_mapper: colorMapper,
         level: 'image',
+      });
+
+      p.cross({
+        x: params.x,
+        y: params.y,
+        size: 10,
       });
     }
 
