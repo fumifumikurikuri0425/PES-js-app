@@ -18,9 +18,9 @@ const initialParams = {
 const apiEndpoint = 'http://localhost:8000/api/test';
 
 function makeArr(startValue, stopValue, cardinality) {
-  var arr = [];
-  var step = (stopValue - startValue) / (cardinality - 1);
-  for (var i = 0; i < cardinality; i++) {
+  const arr = [];
+  const step = (stopValue - startValue) / (cardinality - 1);
+  for (let i = 0; i < cardinality; i++) {
     arr.push(startValue + step * i);
   }
   return arr;
@@ -125,11 +125,11 @@ function Ex1() {
         {
           execute(event) {
             console.log('tap', event.x, event.y);
-            setParams({
+            setParams((params) => ({
               ...params,
               x: event.x,
               y: event.y,
-            });
+            }));
 
             cds.data.x[0] = event.x;
             cds.data.y[0] = event.y;
@@ -183,10 +183,10 @@ function Ex1() {
   const handleChange = (event) => {
     const val = event.target.value;
 
-    setParams({
+    setParams((params) => ({
       ...params,
       [event.target.name]: val,
-    });
+    }));
   };
 
   const handleSubmit = async (event) => {
@@ -209,7 +209,7 @@ function Ex1() {
     const jsonData = await d.json();
     console.log(jsonData);
 
-    setData(jsonData);
+    setData((prev) => jsonData);
   };
 
   useEffect(() => {
