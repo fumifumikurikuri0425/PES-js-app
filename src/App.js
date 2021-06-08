@@ -1,12 +1,12 @@
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 
-import logo from './logo.svg';
-import './App.css';
-import Navbar from './components/NavBar';
-import Top from './pages/Top';
-import Ex1 from './pages/Ex1';
-import Ex2 from './pages/Ex2';
+import logo from "./logo.svg";
+import "./App.css";
+import Navbar from "./components/NavBar";
+import Top from "./pages/Top";
+import Ex1 from "./pages/Ex1";
+import Ex2 from "./pages/Ex2";
 
 function App() {
   return (
@@ -14,9 +14,8 @@ function App() {
       <Router>
         <div>
           <Navbar />
-          <hr />
-          <Route exact path="/" component={Top} />
-          <Route exact path="/Ex1" component={Ex1} />
+          {/* <hr /> */}
+          <Route exact path="/" component={Ex1} />
           <Route exact path="/Ex2" component={Ex2} />
         </div>
       </Router>
