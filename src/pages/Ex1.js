@@ -2,15 +2,19 @@ import { useState, useEffect, useRef } from "react";
 // import { measure } from "skimage";
 import * as gPalette from "google-palette";
 
-import * as d3 from "d3";
+// import * as d3 from "d3";
+import colorMaps from "../colorMaps";
 
-window.d3 = d3;
+import settings from "../settings";
+
+console.log(settings);
 
 const Bokeh = window.Bokeh;
 
 const initialParams = {
   x: -0.75,
   y: 0.55,
+  functionName: "mbp",
   xmin: -2.5,
   xmax: 1.5,
   ymin: -1,
@@ -20,6 +24,8 @@ const initialParams = {
   step: 0.01,
   tone: 20,
   check: 0,
+  optimize_on: true,
+  colorMap: "Inferno",
 };
 
 const apiEndpoint = "http://localhost:8000/api/test";
@@ -68,16 +74,22 @@ function Ex1() {
       height: 530,
     });
 
-    // p.x_range.range_padding = p.y_range.range_padding = 0;
     p.xgrid[0].grid_line_width = p.ygrid[0].grid_line_width = 0;
 
     if (data) {
-      // console.log('draw graph!!!', data);
-      // console.log('params', params);
+      // convert value types
+      params.xmin = parseFloat(params.xmin);
+      params.xmax = parseFloat(params.xmax);
+      params.ymin = parseFloat(params.ymin);
+      params.ymax = parseFloat(params.ymax);
+      params.zmin = parseFloat(params.zmin);
+      params.zmax = parseFloat(params.zmax);
+      params.tone = parseInt(params.tone);
 
       // const pal = gPalette("tol-dv", params.tone).map((c) => `#${c}`);
       const colorNums = makeArr(0, 1, params.tone);
-      const pal = colorNums.map((i) => d3.interpolateInferno(i));
+      //** Color Map
+      const pal = colorNums.map((i) => colorMaps[params.colorMap](i));
       console.log(pal);
       const colorMapper = new Bokeh.LinearColorMapper({
         palette: pal,
@@ -85,8 +97,10 @@ function Ex1() {
         high: params.zmax,
       });
 
+      console.warn(params.tone);
       const levels = makeArr(params.zmin, params.zmax, params.tone + 1);
-
+      console.warn(levels);
+      //** draw color bar
       const colorBar = new Bokeh.ColorBar({
         color_mapper: colorMapper,
         major_label_text_font_size: "8pt",
@@ -98,7 +112,7 @@ function Ex1() {
       });
 
       p.add_layout(colorBar, "right");
-
+      //** draw potential energy surface
       const image = p.image({
         image: [data.data.energy],
         x: params.xmin,
@@ -108,7 +122,7 @@ function Ex1() {
         color_mapper: colorMapper,
         level: "image",
       });
-
+      //** draw contour line
       const contours = data.data.contours;
 
       if (contours) {
@@ -117,45 +131,9 @@ function Ex1() {
           contour.map((c) => {
             const x = c["x_list"];
             const y = c["y_list"];
-            // console.log(x, y);
+
             p.line({ x: x, y: y, color: "grey", line_width: 1, alpha: 1 });
           });
-          // let x = contour[:, 1] / x_shape * (xmax - xmin) + xmin;
-          // let y = contour[:, 0] / y_shape * (ymax - ymin) + ymin;
-        });
-      }
-
-      console.log(data.data);
-      console.log(data.data.optimizeLine);
-      if (data.data.optimizeLine) {
-        const x1_list = data.data.optimizeLine["x1_list"];
-        const y1_list = data.data.optimizeLine["y1_list"];
-        const x2_list = data.data.optimizeLine["x2_list"];
-        const y2_list = data.data.optimizeLine["y2_list"];
-        p.line({
-          x: x1_list,
-          y: y1_list,
-          line_width: 2,
-          color: "#009688",
-          alpha: 0.5,
-        });
-
-        console.log(x1_list[x1_list.length - 1]);
-        console.log(y1_list[y1_list.length - 1]);
-        p.circle({
-          x: x1_list[x1_list.length - 1],
-          y: y1_list[y1_list.length - 1],
-          size: 7,
-          fill_color: "lime",
-          line_width: 0,
-        });
-
-        p.line({
-          x: x2_list,
-          y: y2_list,
-          line_width: 2,
-          color: "cyan",
-          alpha: 0.5,
         });
       }
 
@@ -175,15 +153,7 @@ function Ex1() {
       });
       window.cds = cds;
 
-      p.circle({
-        x: { field: "x" },
-        y: { field: "y" },
-        size: 7,
-        fill_color: "pink",
-        source: cds,
-        line_width: 0,
-      });
-
+      //Initial point function
       p.js_event_callbacks["tap"] = [
         {
           execute(event) {
@@ -201,8 +171,75 @@ function Ex1() {
         },
       ];
 
-      // TODO: add line
+      if (data.data.optimizeLine) {
+        //** draw optimize line
+        p.circle({
+          x: { field: "x" },
+          y: { field: "y" },
+          size: 7,
+          fill_color: "pink",
+          source: cds,
+          line_width: 0,
+        });
 
+        const x1_list = data.data.optimizeLine["x1_list"];
+        const y1_list = data.data.optimizeLine["y1_list"];
+        const x2_list = data.data.optimizeLine["x2_list"];
+        const y2_list = data.data.optimizeLine["y2_list"];
+        const TS = data.data.optimizeLine.TS;
+        const EQ = data.data.optimizeLine.EQ;
+        p.line({
+          x: x1_list,
+          y: y1_list,
+          line_width: 2,
+          color: "#CDDC39",
+          alpha: 0.5,
+        });
+
+        p.circle({
+          x: x1_list[x1_list.length - 1],
+          y: y1_list[y1_list.length - 1],
+          size: 7,
+          fill_color: "lime",
+          line_width: 0,
+        });
+
+        p.line({
+          x: x2_list,
+          y: y2_list,
+          line_width: 2,
+          color: "cyan",
+          alpha: 0.5,
+        });
+
+        //TODO :add Title (TS and EQ)
+        const t1 = new Bokeh.Title({
+          text:
+            "TS: x=" +
+            x1_list[x1_list.length - 1] +
+            " y=" +
+            y1_list[y1_list.length - 1] +
+            " Energy=" +
+            TS,
+
+          align: "center",
+        });
+        p.add_layout(t1, "below");
+
+        const t2 = new Bokeh.Title({
+          text:
+            "EQ: x=" +
+            x2_list[x2_list.length - 1] +
+            " y=" +
+            y2_list[y2_list.length - 1] +
+            " Energy=" +
+            EQ,
+          align: "center",
+        });
+        p.add_layout(t2, "below");
+      }
+
+      //get x range and y range
       p.x_range.property("start").change.connect((_args, x_range) => {
         console.log("x_range.start", x_range.start);
         setParams((params) => ({
@@ -246,10 +283,29 @@ function Ex1() {
   const handleChange = (event) => {
     let val = event.target.value;
 
-    if (event.target.name === "check") {
-      val = parseInt(val);
-    } else if (event.target.name === "zmax" || event.target.name === "zmin") {
-      val = parseFloat(val);
+    if (event.target.name === "function_name") {
+      const s = settings[val];
+
+      const p = {
+        ...s,
+        functionName: val,
+      };
+      setParams({
+        ...params,
+        ...p,
+      });
+
+      return;
+    }
+
+    // if (event.target.name === "check") {
+    //   val = parseInt(val);
+    // } else if (event.target.name === "zmax" || event.target.name === "zmin") {
+    //   val = parseFloat(val);
+    // }
+
+    if (event.target.name === "optimize_on") {
+      val = event.target.checked;
     }
 
     setParams((params) => ({
@@ -299,33 +355,32 @@ function Ex1() {
   return (
     <div>
       <div>
-        <h1>Potential Energy Surface</h1>
+        <header>
+          <a href="/">
+            <h1>Potential Energy Surface</h1>
+          </a>
+        </header>
       </div>
 
       {/* {isLoading && <img src="./ZZ5H.gif" />} */}
       <div id="graph" ref={bokehRoot}></div>
 
-      <form onSubmit={handleSubmit}>
+      <form id="form1" onSubmit={handleSubmit}>
         <div>
-          <label>
-            x:
-            <input
-              type="text"
-              name="x"
-              value={params.x}
-              onChange={handleChange}
-            />
-          </label>
-          <label>
-            y:
-            <input
-              type="text"
-              name="y"
-              value={params.y}
-              onChange={handleChange}
-            />
-          </label>
+          <select
+            name="function_name"
+            value={params.functionName}
+            onChange={handleChange}
+          >
+            <option value={"mbp"}>Muller Brown Potential</option>
+            <option value={"pes1"}>PES1</option>
+            <option value={"pes2"}>PES2</option>
+            <option value={"pes3"}>PES3</option>
+            <option value={"pes4"}>PES4</option>
+            <option value={"pes5"}>PES5</option>
+          </select>
         </div>
+
         <label>
           xmin:
           <input
@@ -335,6 +390,7 @@ function Ex1() {
             onChange={handleChange}
           />
         </label>
+
         <label>
           xmax:
           <input
@@ -344,6 +400,7 @@ function Ex1() {
             onChange={handleChange}
           />
         </label>
+
         <label>
           ymin:
           <input
@@ -353,6 +410,7 @@ function Ex1() {
             onChange={handleChange}
           />
         </label>
+
         <label>
           ymax:
           <input
@@ -362,6 +420,7 @@ function Ex1() {
             onChange={handleChange}
           />
         </label>
+
         <div>
           <label>
             zmin:
@@ -373,6 +432,7 @@ function Ex1() {
               onChange={handleChange}
             />
           </label>
+
           <label>
             zmax:
             <input
@@ -385,9 +445,10 @@ function Ex1() {
             />
           </label>
         </div>
+
         <div>
           <label>
-            color tone:
+            color tone:{" "}
             <input
               name="tone"
               type="number"
@@ -398,6 +459,39 @@ function Ex1() {
             />
           </label>
         </div>
+
+        <div>
+          optimize line:{" "}
+          <input
+            type="checkbox"
+            name="optimize_on"
+            checked={params.optimize_on}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div>
+          <label>
+            Initial x:
+            <input
+              type="text"
+              name="x"
+              value={params.x}
+              onChange={handleChange}
+            />
+          </label>
+
+          <label>
+            Initial y:
+            <input
+              type="text"
+              name="y"
+              value={params.y}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
+
         <label>
           Newton Raphson step:
           <input
@@ -410,26 +504,30 @@ function Ex1() {
             onChange={handleChange}
           />
         </label>
-        <label>
-          left{" "}
-          <input
-            type="radio"
-            name="check"
-            value={0}
-            checked={params.check === 0}
-            onChange={handleChange}
-          />
-        </label>
-        <label>
-          right{" "}
-          <input
-            type="radio"
-            name="check"
-            value={1}
-            checked={params.check === 1}
-            onChange={handleChange}
-          />
-        </label>
+
+        <div>
+          saddle point:{" "}
+          <label>
+            left{" "}
+            <input
+              type="radio"
+              name="check"
+              value={0}
+              checked={params.check === 0}
+              onChange={handleChange}
+            />
+          </label>
+          <label>
+            right{" "}
+            <input
+              type="radio"
+              name="check"
+              value={1}
+              checked={params.check === 1}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
 
         <div>
           <input type="submit" value="Submit" />

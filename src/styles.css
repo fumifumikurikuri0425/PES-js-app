@@ -37,10 +37,11 @@ a {
 
 div#graph {
   display: block;
+  margin-top: 15px;
+  margin-bottom: auto;
   margin-left: auto;
   margin-right: auto;
   width: 700px;
-  /* margin: auto auto auto auto; */
 }
 
 form {
@@ -90,4 +91,9 @@ label {
 
 .pageLink {
   margin: 30px;
+}
+
+.valueDisplay {
+  /* font-size: 50px; */
+  color: red;
 }

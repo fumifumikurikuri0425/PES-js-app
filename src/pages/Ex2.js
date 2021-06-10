@@ -130,13 +130,9 @@ function Ex2() {
 
   const handleChange = (event) => {
     let val = event.target.value;
-
-    if (event.target.name === "check") {
-      val = parseInt(val);
-    } else if (event.target.name === "zmax" || event.target.name === "zmin") {
+    if (event.target.name === "zmax" || event.target.name === "zmin") {
       val = parseFloat(val);
     }
-
     setParams((params) => ({
       ...params,
       [event.target.name]: val,
@@ -164,6 +160,12 @@ function Ex2() {
     console.log(jsonData);
 
     setData(jsonData);
+    console.log(jsonData.data.xmin);
+    setParams((prams) => ({
+      ...params,
+      // xmin: jsonData.data.xmin,
+      ...jsonData.data,
+    }));
   };
 
   useEffect(() => {
@@ -196,12 +198,7 @@ function Ex2() {
         </label>
         <label>
           xmax:
-          <input
-            type="text"
-            name="xmax"
-            value={params.xmax}
-            onChange={handleChange}
-          />
+          <span className="valueDisplay">{params.xmax}</span>
         </label>
         <label>
           ymin:
