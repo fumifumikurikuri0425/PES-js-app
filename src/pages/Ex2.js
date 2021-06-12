@@ -11,6 +11,7 @@ const Bokeh = window.Bokeh;
 const initialParams = {
   zmax: 100,
   tone: 20,
+  contour_on: true,
 };
 
 const apiEndpoint = "http://localhost:8000/api/file";
@@ -99,14 +100,15 @@ function Ex2() {
         level: "image",
       });
 
-      const contours = data.data.contours;
-
-      if (contours) {
+      //** draw contour line
+      if (data.data.contours) {
+        const contours = data.data.contours.contours;
         console.log(contours);
         contours.map((contour) => {
           contour.map((c) => {
             const x = c["x_list"];
             const y = c["y_list"];
+
             p.line({ x: x, y: y, color: "grey", line_width: 1, alpha: 1 });
           });
         });
@@ -132,6 +134,10 @@ function Ex2() {
     let val = event.target.value;
     if (event.target.name === "zmax" || event.target.name === "zmin") {
       val = parseFloat(val);
+    }
+
+    if (event.target.type === "checkbox") {
+      val = event.target.checked;
     }
     setParams((params) => ({
       ...params,
@@ -253,6 +259,16 @@ function Ex2() {
               onChange={handleChange}
             />
           </label>
+        </div>
+
+        <div>
+          contour line:{" "}
+          <input
+            type="checkbox"
+            name="contour_on"
+            checked={params.contour_on}
+            onChange={handleChange}
+          />
         </div>
 
         <div>

@@ -7,6 +7,7 @@ import Navbar from "./components/NavBar";
 import Top from "./pages/Top";
 import Ex1 from "./pages/Ex1";
 import Ex2 from "./pages/Ex2";
+import Ex3 from "./pages/Ex3";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           {/* <hr /> */}
           <Route exact path="/" component={Ex1} />
           <Route exact path="/Ex2" component={Ex2} />
+          <Route exact path="/Ex3" component={Ex3} />
         </div>
       </Router>
     </div>

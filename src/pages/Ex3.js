@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import CodeMirror from "@uiw/react-codemirror";
 // import { measure } from "skimage";
 import * as gPalette from "google-palette";
 
@@ -11,16 +12,21 @@ console.log(settings);
 
 const Bokeh = window.Bokeh;
 
+const initialCode = `def E(x, y):
+    Exy = 0
+    Exy = np.sin(x) * np.cos(y)
+    return Exy`;
+
 const initialParams = {
-  x: -0.75,
-  y: 0.55,
+  x: 5.8,
+  y: 4.2,
   functionName: "mbp",
-  xmin: -2.5,
-  xmax: 1.5,
-  ymin: -1,
-  ymax: 3,
-  zmin: -147,
-  zmax: 100,
+  xmin: 0,
+  xmax: 10,
+  ymin: 0,
+  ymax: 10,
+  zmin: -1,
+  zmax: 1,
   step: 0.01,
   tone: 20,
   check: 0,
@@ -29,7 +35,7 @@ const initialParams = {
   colorMap: "Inferno",
 };
 
-const apiEndpoint = "http://localhost:8000/api/test";
+const apiEndpoint = "http://localhost:8000/api/write";
 
 function makeArr(startValue, stopValue, cardinality) {
   var arr = [];
@@ -40,10 +46,11 @@ function makeArr(startValue, stopValue, cardinality) {
   return arr;
 }
 
-function Ex1() {
+function Ex3() {
   const bokehRoot = useRef(null);
   const [params, setParams] = useState(initialParams);
   const [data, setData] = useState(null);
+  const [code, setCode] = useState(initialCode);
   const [isLoading, setIsLoading] = useState(false);
 
   let views = null;
@@ -211,6 +218,7 @@ function Ex1() {
           alpha: 0.5,
         });
 
+        //TODO :add Title (TS and EQ)
         const t1 = new Bokeh.Title({
           text:
             "TS: x=" +
@@ -278,11 +286,19 @@ function Ex1() {
     return p;
   };
 
+  const handleCodeChange = (instance, change) => {
+    console.log(code, change);
+    console.log(instance);
+    console.log(instance.getValue());
+    setCode(instance.getValue());
+  };
+
   const handleChange = (event) => {
     let val = event.target.value;
 
     if (event.target.name === "function_name") {
       const s = settings[val];
+
       const p = {
         ...s,
         functionName: val,
@@ -291,24 +307,9 @@ function Ex1() {
         ...params,
         ...p,
       });
+
       return;
     }
-    // if (event.target.name === "color_map") {
-    //   const c = colorMaps[val];
-
-    //   const p = {
-    //     ...s,
-    //     ...c,
-    //     functionName: val,
-    //     colorMaps:val,
-    //   };
-    //   setParams({
-    //     ...params,
-    //     ...p,
-    //   });
-
-    //   return;
-    // }
 
     if (event.target.name === "check") {
       val = parseInt(val);
@@ -338,6 +339,9 @@ function Ex1() {
 
     // validation and submit
     const formData = new FormData(event.target);
+
+    console.log("code:", code);
+    formData.append("code", code);
 
     const options = {
       method: "POST",
@@ -373,7 +377,7 @@ function Ex1() {
       <div>
         <header>
           <a href="/">
-            <h1>Potential Energy Surface</h1>
+            <h1>Potential Energy Surface (WRITE)</h1>
           </a>
         </header>
       </div>
@@ -382,19 +386,18 @@ function Ex1() {
       <div id="graph" ref={bokehRoot}></div>
 
       <form id="form1" onSubmit={handleSubmit}>
-        <div>
-          <select
-            name="function_name"
-            value={params.functionName}
-            onChange={handleChange}
-          >
-            <option value={"mbp"}>Muller Brown Potential</option>
-            <option value={"pes1"}>PES1</option>
-            <option value={"pes2"}>PES2</option>
-            <option value={"pes3"}>PES3</option>
-            <option value={"pes4"}>PES4</option>
-            <option value={"pes5"}>PES5</option>
-          </select>
+        <div className="code">
+          <CodeMirror
+            value={code}
+            options={{
+              // theme: 'monokai',
+              // keyMap: 'sublime',
+              tabSize: 4,
+              indentUnit: 4,
+              mode: "python",
+            }}
+            onChange={handleCodeChange}
+          />
         </div>
 
         <label>
@@ -474,28 +477,6 @@ function Ex1() {
               onChange={handleChange}
             />
           </label>
-        </div>
-
-        <div>
-          <select
-            name="color_map"
-            value={params.colorMap}
-            onChange={handleChange}
-          >
-            <option value={"Inferno"}>Inferno</option>
-            <option value={"Magma"}>Magma</option>
-            <option value={"Plasma"}>Plasma</option>
-            <option value={"Cividis"}>Cividis</option>
-            <option value={"Warm"}>Warm</option>
-            <option value={"Cool"}>Cool</option>
-            <option value={"CubehelixDefault"}>CubehelixDefault</option>
-            <option value={"Rainbow"}>Rainbow</option>
-            <option value={"Sinebow"}>Sinebow</option>
-            <option value={"Turbo"}>Turbo</option>
-            <option value={"Greys"}>Greys</option>
-            <option value={"Spectral"}>Spectral</option>
-            <option value={"RdYlBu"}>RdYlBu</option>
-          </select>
         </div>
 
         <div>
@@ -585,4 +566,4 @@ function Ex1() {
   );
 }
 
-export default Ex1;
+export default Ex3;

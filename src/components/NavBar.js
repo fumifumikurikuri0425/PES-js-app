@@ -9,6 +9,7 @@ function Navbar() {
       </Link>
       {/* <Link to="/Ex1">Ex1</Link> */}
       <Link to="/Ex2">File</Link>
+      <Link to="/Ex3">Write</Link>
     </div>
   );
 }
