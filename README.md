@@ -43,4 +43,4 @@ The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
 ## License
-MIT
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)
