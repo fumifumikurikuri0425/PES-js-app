@@ -17,10 +17,11 @@ Clone and enter the project directory:
 ```
 git clone https://github.com/fumifumikurikuri0425/PES-js-app.git
 ``` 
-If you haven't clone python repo
+If you haven't clone python repository, please clone https://github.com/fumifumikurikuri0425/PES_py_app.git
 
 Prerequisites:
 - [yarn](https://nodejs.org/en://yarnpkg.com/en/docs/install)
+- [Node.js](https://nodejs.org/)
 
 ## Available Scripts
 Install the project dependencies:
@@ -41,4 +42,5 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
-
+## License
+MIT
