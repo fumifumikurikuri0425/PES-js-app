@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-// import { measure } from "skimage";
-import * as gPalette from "google-palette";
+import colorMaps from "../colorMaps";
 
 import * as d3 from "d3";
 
@@ -12,6 +11,7 @@ const initialParams = {
   zmax: 100,
   tone: 20,
   contour_on: true,
+  colorMap: "Inferno",
 };
 
 const apiEndpoint = "http://localhost:8000/api/file";
@@ -59,16 +59,11 @@ function Ex2() {
       height: 530,
     });
 
-    // p.x_range.range_padding = p.y_range.range_padding = 0;
     p.xgrid[0].grid_line_width = p.ygrid[0].grid_line_width = 0;
 
     if (data) {
-      // console.log('draw graph!!!', data);
-      // console.log('params', params);
-
-      // const pal = gPalette("tol-dv", params.tone).map((c) => `#${c}`);
       const colorNums = makeArr(0, 1, params.tone);
-      const pal = colorNums.map((i) => d3.interpolateInferno(i));
+      const pal = colorNums.map((i) => colorMaps[params.colorMap](i));
       console.log(pal);
       const colorMapper = new Bokeh.LinearColorMapper({
         palette: pal,
@@ -136,6 +131,23 @@ function Ex2() {
       val = parseFloat(val);
     }
 
+    if (event.target.name === "color_map") {
+      const c = colorMaps[val];
+      const color = {
+        ...c,
+        colorMap: val,
+      };
+      setParams({
+        ...params,
+        ...color,
+      });
+      return;
+    }
+
+    if (event.target.name === "contour_on") {
+      val = event.target.checked;
+    }
+
     if (event.target.type === "checkbox") {
       val = event.target.checked;
     }
@@ -148,6 +160,7 @@ function Ex2() {
   const handleSubmit = async (event) => {
     console.warn("The form was submitted:", params);
     event.preventDefault();
+    // setIsLoading(true);
 
     // validation and submit
     const formData = new FormData(event.target);
@@ -165,6 +178,7 @@ function Ex2() {
     const jsonData = await d.json();
     console.log(jsonData);
 
+    // setIsLoading(false);
     setData(jsonData);
     console.log(jsonData.data.xmin);
     setParams((prams) => ({
@@ -182,25 +196,27 @@ function Ex2() {
     };
   }, [data]);
 
+  // if (isLoading) {
+  //   return <img src="./ZZ5H.gif" />;
+  // }
+
   return (
     <div>
       <div>
-        <h1>Potential Energy Surface</h1>
+        <header>
+          <a href="/Ex2">
+            <h1>Potential Energy Surface(File)</h1>
+          </a>
+        </header>
       </div>
       <div id="graph" ref={bokehRoot}></div>
       <form onSubmit={handleSubmit}>
         <div>
-          file:
-          <input type="file" name="file" />
+          file(.csv): <input type="file" name="file" />
         </div>
         <label>
           xmin:
-          <input
-            type="text"
-            name="xmin"
-            value={params.xmin}
-            onChange={handleChange}
-          />
+          <span className="valueDisplay">{params.xmin}</span>
         </label>
         <label>
           xmax:
@@ -259,6 +275,28 @@ function Ex2() {
               onChange={handleChange}
             />
           </label>
+        </div>
+
+        <div>
+          <select
+            name="color_map"
+            value={params.colorMap}
+            onChange={handleChange}
+          >
+            <option value={"Inferno"}>Inferno</option>
+            <option value={"Magma"}>Magma</option>
+            <option value={"Plasma"}>Plasma</option>
+            <option value={"Cividis"}>Cividis</option>
+            <option value={"Warm"}>Warm</option>
+            <option value={"Cool"}>Cool</option>
+            <option value={"CubehelixDefault"}>CubehelixDefault</option>
+            <option value={"Rainbow"}>Rainbow</option>
+            <option value={"Sinebow"}>Sinebow</option>
+            <option value={"Turbo"}>Turbo</option>
+            <option value={"Greys"}>Greys</option>
+            <option value={"Spectral"}>Spectral</option>
+            <option value={"RdYlBu"}>RdYlBu</option>
+          </select>
         </div>
 
         <div>

@@ -5,11 +5,14 @@ function Navbar() {
   return (
     <div>
       <Link className="pageLink" to="/">
-        Home{" "}
+        Preset
       </Link>
-      {/* <Link to="/Ex1">Ex1</Link> */}
-      <Link to="/Ex2">File</Link>
-      <Link to="/Ex3">Write</Link>
+      <Link className="pageLink" to="/Ex2">
+        File
+      </Link>
+      <Link className="pageLink" to="/Ex3">
+        Code
+      </Link>
     </div>
   );
 }

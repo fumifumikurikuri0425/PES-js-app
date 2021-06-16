@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import CodeMirror from "@uiw/react-codemirror";
-// import { measure } from "skimage";
-import * as gPalette from "google-palette";
-
-// import * as d3 from "d3";
+import EnergyProfile from "../components/EnergyProfile";
 import colorMaps from "../colorMaps";
 
 import settings from "../settings";
@@ -94,7 +91,6 @@ function Ex3() {
       params.zmax = parseFloat(params.zmax);
       params.tone = parseInt(params.tone);
 
-      // const pal = gPalette("tol-dv", params.tone).map((c) => `#${c}`);
       const colorNums = makeArr(0, 1, params.tone);
       //** Color Map
       const pal = colorNums.map((i) => colorMaps[params.colorMap](i));
@@ -218,7 +214,6 @@ function Ex3() {
           alpha: 0.5,
         });
 
-        //TODO :add Title (TS and EQ)
         const t1 = new Bokeh.Title({
           text:
             "TS: x=" +
@@ -243,6 +238,12 @@ function Ex3() {
           align: "center",
         });
         p.add_layout(t2, "below");
+
+        const t3 = new Bokeh.Title({
+          text: "Number of calculations=" + data.data.optimizeLine.count,
+          align: "center",
+        });
+        p.add_layout(t3, "below");
       }
 
       //get x range and y range
@@ -298,7 +299,6 @@ function Ex3() {
 
     if (event.target.name === "function_name") {
       const s = settings[val];
-
       const p = {
         ...s,
         functionName: val,
@@ -307,16 +307,26 @@ function Ex3() {
         ...params,
         ...p,
       });
+      return;
+    }
 
+    if (event.target.name === "color_map") {
+      const c = colorMaps[val];
+      const color = {
+        ...c,
+        colorMap: val,
+      };
+      setParams({
+        ...params,
+        ...color,
+      });
       return;
     }
 
     if (event.target.name === "check") {
       val = parseInt(val);
     }
-    // } else if (event.target.name === "zmax" || event.target.name === "zmin") {
-    //   val = parseFloat(val);
-    // }
+
     if (event.target.name === "contour_on") {
       val = event.target.checked;
     }
@@ -376,22 +386,26 @@ function Ex3() {
     <div>
       <div>
         <header>
-          <a href="/">
-            <h1>Potential Energy Surface (WRITE)</h1>
+          <a href="/Ex3">
+            <h1>Potential Energy Surface (Code)</h1>
           </a>
         </header>
       </div>
 
-      {/* {isLoading && <img src="./ZZ5H.gif" />} */}
       <div id="graph" ref={bokehRoot}></div>
+      {data && data.data && data.data.optimizeLine && (
+        <EnergyProfile
+          distance={data.data.optimizeLine.Distance_list}
+          energy={data.data.optimizeLine.Energy_list}
+          tsPoint={data.data.optimizeLine.TS_point}
+        ></EnergyProfile>
+      )}
 
       <form id="form1" onSubmit={handleSubmit}>
         <div className="code">
           <CodeMirror
             value={code}
             options={{
-              // theme: 'monokai',
-              // keyMap: 'sublime',
               tabSize: 4,
               indentUnit: 4,
               mode: "python",
@@ -477,6 +491,28 @@ function Ex3() {
               onChange={handleChange}
             />
           </label>
+        </div>
+
+        <div>
+          <select
+            name="color_map"
+            value={params.colorMap}
+            onChange={handleChange}
+          >
+            <option value={"Inferno"}>Inferno</option>
+            <option value={"Magma"}>Magma</option>
+            <option value={"Plasma"}>Plasma</option>
+            <option value={"Cividis"}>Cividis</option>
+            <option value={"Warm"}>Warm</option>
+            <option value={"Cool"}>Cool</option>
+            <option value={"CubehelixDefault"}>CubehelixDefault</option>
+            <option value={"Rainbow"}>Rainbow</option>
+            <option value={"Sinebow"}>Sinebow</option>
+            <option value={"Turbo"}>Turbo</option>
+            <option value={"Greys"}>Greys</option>
+            <option value={"Spectral"}>Spectral</option>
+            <option value={"RdYlBu"}>RdYlBu</option>
+          </select>
         </div>
 
         <div>

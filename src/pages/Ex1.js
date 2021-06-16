@@ -1,11 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-// import { measure } from "skimage";
-import * as gPalette from "google-palette";
-
-// import * as d3 from "d3";
-import colorMaps from "../colorMaps";
-
+import EnergyProfile from "../components/EnergyProfile";
 import settings from "../settings";
+import colorMaps from "../colorMaps";
 
 console.log(settings);
 
@@ -87,7 +83,6 @@ function Ex1() {
       params.zmax = parseFloat(params.zmax);
       params.tone = parseInt(params.tone);
 
-      // const pal = gPalette("tol-dv", params.tone).map((c) => `#${c}`);
       const colorNums = makeArr(0, 1, params.tone);
       //** Color Map
       const pal = colorNums.map((i) => colorMaps[params.colorMap](i));
@@ -235,6 +230,12 @@ function Ex1() {
           align: "center",
         });
         p.add_layout(t2, "below");
+
+        const t3 = new Bokeh.Title({
+          text: "Number of calculations=" + data.data.optimizeLine.count,
+          align: "center",
+        });
+        p.add_layout(t3, "below");
       }
 
       //get x range and y range
@@ -293,29 +294,24 @@ function Ex1() {
       });
       return;
     }
-    // if (event.target.name === "color_map") {
-    //   const c = colorMaps[val];
 
-    //   const p = {
-    //     ...s,
-    //     ...c,
-    //     functionName: val,
-    //     colorMaps:val,
-    //   };
-    //   setParams({
-    //     ...params,
-    //     ...p,
-    //   });
-
-    //   return;
-    // }
+    if (event.target.name === "color_map") {
+      const c = colorMaps[val];
+      const color = {
+        ...c,
+        colorMap: val,
+      };
+      setParams({
+        ...params,
+        ...color,
+      });
+      return;
+    }
 
     if (event.target.name === "check") {
       val = parseInt(val);
     }
-    // } else if (event.target.name === "zmax" || event.target.name === "zmin") {
-    //   val = parseFloat(val);
-    // }
+
     if (event.target.name === "contour_on") {
       val = event.target.checked;
     }
@@ -378,8 +374,19 @@ function Ex1() {
         </header>
       </div>
 
-      {/* {isLoading && <img src="./ZZ5H.gif" />} */}
-      <div id="graph" ref={bokehRoot}></div>
+      <div className="f-container">
+        <div id="graph" ref={bokehRoot}></div>
+
+        {data && data.data && data.data.optimizeLine && (
+          <div className="graph-container">
+            <EnergyProfile
+              distance={data.data.optimizeLine.Distance_list}
+              energy={data.data.optimizeLine.Energy_list}
+              tsPoint={data.data.optimizeLine.TS_point}
+            ></EnergyProfile>
+          </div>
+        )}
+      </div>
 
       <form id="form1" onSubmit={handleSubmit}>
         <div>

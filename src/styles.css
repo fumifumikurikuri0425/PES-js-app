@@ -95,9 +95,23 @@ label {
 
 .valueDisplay {
   /* font-size: 50px; */
-  color: red;
+  color:black;
 }
 
 .code {
   text-align: left;
+}
+
+.f-container {
+  display:flex;
+  flex-wrap: wrap;
+}
+
+.f-item {
+
+}
+
+.graph-container {
+  margin-left: auto;
+  margin-right: auto;
 }
