@@ -362,8 +362,15 @@ function Ex3() {
     };
     delete options.headers["Content-Type"];
 
-    const d = await fetch(apiEndpoint, options);
-    const jsonData = await d.json();
+    let d = null;
+    let jsonData = null;
+    try {
+      d = await fetch(apiEndpoint, options);
+      jsonData = await d.json();
+    } catch (e) {
+      alert("Error!");
+    }
+
     console.log(jsonData);
 
     setIsLoading(false);
@@ -392,14 +399,18 @@ function Ex3() {
         </header>
       </div>
 
-      <div id="graph" ref={bokehRoot}></div>
-      {data && data.data && data.data.optimizeLine && (
-        <EnergyProfile
-          distance={data.data.optimizeLine.Distance_list}
-          energy={data.data.optimizeLine.Energy_list}
-          tsPoint={data.data.optimizeLine.TS_point}
-        ></EnergyProfile>
-      )}
+      <div className="f-container">
+        <div id="graph" ref={bokehRoot}></div>
+        {data && data.data && data.data.optimizeLine && (
+          <div className="graph-container">
+            <EnergyProfile
+              distance={data.data.optimizeLine.Distance_list}
+              energy={data.data.optimizeLine.Energy_list}
+              tsPoint={data.data.optimizeLine.TS_point}
+            ></EnergyProfile>
+          </div>
+        )}
+      </div>
 
       <form id="form1" onSubmit={handleSubmit}>
         <div className="code">

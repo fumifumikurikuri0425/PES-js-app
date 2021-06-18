@@ -94,7 +94,8 @@ label {
 }
 
 .valueDisplay {
-  /* font-size: 50px; */
+  margin-right: 2px;
+  margin-left: 1px;
   color:black;
 }
 

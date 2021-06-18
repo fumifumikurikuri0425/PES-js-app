@@ -25,7 +25,7 @@ const initialParams = {
   colorMap: "Inferno",
 };
 
-const apiEndpoint = "http://localhost:8000/api/test";
+const apiEndpoint = "http://localhost:8000/";
 
 function makeArr(startValue, stopValue, cardinality) {
   var arr = [];
@@ -344,8 +344,14 @@ function Ex1() {
     };
     delete options.headers["Content-Type"];
 
-    const d = await fetch(apiEndpoint, options);
-    const jsonData = await d.json();
+    let d = null;
+    let jsonData = null;
+    try {
+      d = await fetch(apiEndpoint, options);
+      jsonData = await d.json();
+    } catch (e) {
+      alert("Error!");
+    }
     console.log(jsonData);
 
     setIsLoading(false);

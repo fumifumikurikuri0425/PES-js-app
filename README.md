@@ -10,20 +10,21 @@ A potential energy surface (PES) describes the energy of a system, especially a 
 
 This app can draw beautiful PES and search EQ and TS.
 
-You can draw PES from files or writing function program. 
+You can draw PES from files or writing function program.
 
 ## Installation
 Clone and enter the project directory:
 ```
 git clone https://github.com/fumifumikurikuri0425/PES-js-app.git
-``` 
+
+cd PES-js-app
+```
 If you haven't clone python repository, please clone https://github.com/fumifumikurikuri0425/PES_py_app.git
 
 Prerequisites:
 - [yarn](https://nodejs.org/en://yarnpkg.com/en/docs/install)
 - [Node.js](https://nodejs.org/)
 
-## Available Scripts
 Install the project dependencies:
 ```
 yarn
@@ -41,6 +42,13 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.\
 You will also see any lint errors in the console.
+
+## About Files
+`Ex1.js` is coded for Preset.
+
+`Ex2.js` is coded for File.
+
+`Ex3.js` is coded for Code.
 
 ## License
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE)

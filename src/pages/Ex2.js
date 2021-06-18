@@ -29,6 +29,8 @@ function Ex2() {
   const bokehRoot = useRef(null);
   const [params, setParams] = useState(initialParams);
   const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const fileRef = useRef(null);
 
   let views = null;
 
@@ -160,7 +162,7 @@ function Ex2() {
   const handleSubmit = async (event) => {
     console.warn("The form was submitted:", params);
     event.preventDefault();
-    // setIsLoading(true);
+    setIsLoading(true);
 
     // validation and submit
     const formData = new FormData(event.target);
@@ -174,13 +176,19 @@ function Ex2() {
     };
     delete options.headers["Content-Type"];
 
-    const d = await fetch(apiEndpoint, options);
-    const jsonData = await d.json();
+    let d = null;
+    let jsonData = null;
+    try {
+      d = await fetch(apiEndpoint, options);
+      jsonData = await d.json();
+    } catch (e) {
+      alert("Error!");
+    }
     console.log(jsonData);
 
-    // setIsLoading(false);
+    setIsLoading(false);
     setData(jsonData);
-    console.log(jsonData.data.xmin);
+
     setParams((prams) => ({
       ...params,
       // xmin: jsonData.data.xmin,
@@ -196,10 +204,6 @@ function Ex2() {
     };
   }, [data]);
 
-  // if (isLoading) {
-  //   return <img src="./ZZ5H.gif" />;
-  // }
-
   return (
     <div>
       <div>
@@ -209,14 +213,17 @@ function Ex2() {
           </a>
         </header>
       </div>
-      <div id="graph" ref={bokehRoot}></div>
+      {isLoading ? (
+        <img src="./ZZ5H.gif" />
+      ) : (
+        <div id="graph" ref={bokehRoot}></div>
+      )}
       <form onSubmit={handleSubmit}>
         <div>
-          file(.csv): <input type="file" name="file" />
+          file(.csv): <input type="file" name="file" ref={fileRef} />
         </div>
         <label>
-          xmin:
-          <span className="valueDisplay">{params.xmin}</span>
+          xmin: <span className="valueDisplay">{params.xmin}</span>
         </label>
         <label>
           xmax:
@@ -224,32 +231,16 @@ function Ex2() {
         </label>
         <label>
           ymin:
-          <input
-            type="text"
-            name="ymin"
-            value={params.ymin}
-            onChange={handleChange}
-          />
+          <span className="valueDisplay">{params.ymin}</span>
         </label>
         <label>
           ymax:
-          <input
-            type="text"
-            name="ymax"
-            value={params.ymax}
-            onChange={handleChange}
-          />
+          <span className="valueDisplay">{params.ymax}</span>
         </label>
         <div>
           <label>
             zmin:
-            <input
-              name="zmin"
-              type="text"
-              size="10"
-              value={params.zmin}
-              onChange={handleChange}
-            />
+            <span className="valueDisplay">{params.zmin}</span>
           </label>
           <label>
             zmax:
