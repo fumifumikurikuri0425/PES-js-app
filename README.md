@@ -22,7 +22,7 @@ cd PES-js-app
 If you haven't clone python repository, please clone https://github.com/fumifumikurikuri0425/PES_py_app.git
 
 Prerequisites:
-- [yarn](https://nodejs.org/en://yarnpkg.com/en/docs/install)
+- [yarn](https://yarnpkg.com/)
 - [Node.js](https://nodejs.org/)
 
 Install the project dependencies:
