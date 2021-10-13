@@ -23,7 +23,7 @@ If you haven't clone python repository, please clone https://github.com/fumifumi
 
 Prerequisites:
 - [yarn](https://yarnpkg.com/)
-- [Node.js](https://nodejs.org/)
+- [Node.js](https://nodejs.org/en/download/)
 
 Install the project dependencies:
 ```
