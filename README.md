@@ -5,6 +5,7 @@ These programs are used on the client side.
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## About PES App
+![FBB92E2C-86F4-464F-9517-1E4C1338DD90_1_105_c](https://user-images.githubusercontent.com/83212005/137248905-3b60ff2c-e86d-4bf0-a689-942300386d0e.jpeg)
 
 A potential energy surface (PES) describes the energy of a system, especially a collection of atoms, in terms of certain parameters.
 
